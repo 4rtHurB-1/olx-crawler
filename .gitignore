@@ -1,0 +1,11 @@
+# Created by .ignore support plugin (hsz.mobi)
+.DS_Store
+target/*
+.idea/*
+/save-to-git
+/src/main/scala/ria/
+.idea/
+target/
+/tmp/
+project/project/
+/project/target/

@@ -62,6 +62,7 @@ object Parser {
       "url" -> url,
       "usrid" -> usrid,
       parseHtml("username")(_.select("div.quickcontact__user-name").text()),
+      parseHtml("adv_list_url")(_.select("a.user-offers").attr("href")),
       "created_at" -> LocalDateTime
         .now()
         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
@@ -104,6 +105,29 @@ object Parser {
         log.error("Error parsing phones: {}!", m)
         m
     }.get
+
+   def parseAdvLocations(responseBody: String): String =
+       Try {
+         val soup: Document = Jsoup.parse(responseBody)
+
+         val locations: String = soup
+            .select("td.bottom-cell")
+            .asScala
+            .map({ td =>
+                val location: String = td.select(".breadcrumb").get(0).text()
+                location
+            })
+            .toSet
+            .toList
+            .mkString(",")
+
+         locations
+       }.recover {
+         case e =>
+           val m: String = e.getMessage
+           log.error("Error parsing locations: {}!", m)
+           m
+       }.get
 
   case class Phones(value: String)
 

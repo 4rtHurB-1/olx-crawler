@@ -33,6 +33,7 @@ object Scrapper {
             .take(order.max)
             .via(downloadAdvertisements)
             .via(downloadPhones)
+            .via(downloadAdvLocations)
             .mapAsyncUnordered(1)(Mongo.saveToMongo(order, mongoCollection))
             .map(_.removed("html"))
             .map(_.toJson)
@@ -109,5 +110,35 @@ object Scrapper {
                 data
             }
       } //.withAttributes(ActorAttributes.supervisionStrategy(_ => Supervision.Resume))
+
+  private def downloadAdvLocations(implicit
+      globalState: ActorSystem[StateActor.Request],
+      ec: ExecutionContext
+    ): Flow[Map[String, String], Map[String, String], NotUsed] =
+      Flow[Map[String, String]]
+        .throttle(Config.throttleElements, Config.throttleInterval)
+        .mapAsyncUnordered(Config.numberOfDownloadThreads) {
+          case (data) =>
+            val advListUrl = data("adv_list_url")
+            val req = HttpRequest(uri = advListUrl)
+            log.debug(
+              s"Downloading adv locations for `${data("url")}` ..."
+            )
+            (httpClient
+              .send(req, Config.retries)
+              .map { response: String =>
+                val locations: String = Parser.parseAdvLocations(response)
+                data.updated("locations", locations)
+              })
+              .recover {
+                case e =>
+                  log.error(
+                    "Failed to get locations for {}: {}!",
+                    data("url"),
+                    e.getMessage
+                  )
+                  data
+              }
+        } //.withAttributes(ActorAttributes.supervisionStrategy(_ => Supervision.Resume))
 
 }

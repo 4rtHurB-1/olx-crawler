@@ -114,7 +114,14 @@ object Parser {
             .select("td.bottom-cell")
             .asScala
             .map({ td =>
-                val location: String = td.select(".breadcrumb").get(0).text().trim()
+                val location: String = td
+                    .select(".breadcrumb")
+                    .get(0)
+                    .text()
+                    .split(",")
+                    .head
+                    .trim()
+
                 location
             })
             .toSet

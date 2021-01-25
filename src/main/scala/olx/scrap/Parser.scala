@@ -108,13 +108,13 @@ object Parser {
 
    def parseAdvLocations(responseBody: String): String =
        Try {
-         val soup: Document = Jsoup.parse(responseBody)
+         val doc: Document = Jsoup.parse(responseBody)
 
-         val locations: String = soup
+         val locations: String = doc
             .select("td.bottom-cell")
             .asScala
             .map({ td =>
-                val location: String = td.select(".breadcrumb").get(0).text()
+                val location: String = td.select(".breadcrumb").get(0).text().trim()
                 location
             })
             .toSet

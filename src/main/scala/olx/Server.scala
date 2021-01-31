@@ -61,10 +61,10 @@ object Server
       }
 
   val bindingFuture: Future[Http.ServerBinding] =
-    Http().newServerAt("172.31.43.63", 3031).bindFlow(route)
+    Http().newServerAt("172.31.16.228", 3031).bindFlow(route)
 
   println(
-    s"Сервер запущен http://172.31.43.63:3031/\nНажмите RETURN чтобы прекратить работу..."
+    s"Сервер запущен http://172.31.16.228:3031/\nНажмите RETURN чтобы прекратить работу..."
   )
   StdIn.readLine()
   bindingFuture

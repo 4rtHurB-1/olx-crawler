@@ -120,25 +120,30 @@ object Scrapper {
         .mapAsyncUnordered(Config.numberOfDownloadThreads) {
           case (data) =>
             val advListUrl = data("adv_list_url")
-            val req = HttpRequest(uri = advListUrl)
-            log.debug(
-              s"Downloading adv locations for `${data("url")}` ..."
-            )
-            (httpClient
-              .send(req, Config.retries)
-              .map { response: String =>
-                val locations: String = Parser.parseAdvLocations(response)
-                data.updated("locations", locations)
-              })
-              .recover {
-                case e =>
-                  log.error(
-                    "Failed to get locations for {}: {}!",
-                    data("url"),
-                    e.getMessage
-                  )
-                  data
-              }
+            if(advListUrl.nonEmpty) {
+                val req = HttpRequest(uri = advListUrl)
+                log.debug(
+                  s"Downloading adv locations for `${data("url")}` ..."
+                )
+                (httpClient
+                  .send(req, Config.retries)
+                  .map { response: String =>
+                    val locations: String = Parser.parseAdvLocations(response)
+                    data.updated("locations", locations)
+                  })
+                  .recover {
+                    case e =>
+                      log.error(
+                        "Failed to get locations for {}: {}!",
+                        data("url"),
+                        e.getMessage
+                      )
+                      data
+                  }
+            } else {
+                log.error("Not found locations for {}", data("url"))
+                Future.successful(data)
+            }
         } //.withAttributes(ActorAttributes.supervisionStrategy(_ => Supervision.Resume))
 
 }

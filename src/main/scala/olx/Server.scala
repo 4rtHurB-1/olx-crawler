@@ -10,6 +10,7 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.{Directives, Route}
 import olx.scrap.{Scrapper, StateActor}
+import olx.{Config}
 import reactivemongo.api.AsyncDriver
 import spray.json.{DefaultJsonProtocol, PrettyPrinter}
 
@@ -61,7 +62,7 @@ object Server
       }
 
   val bindingFuture: Future[Http.ServerBinding] =
-    Http().newServerAt("172.31.16.228", 3031).bindFlow(route)
+    Http().newServerAt(Config.ipAddress, 3031).bindFlow(route)
 
   println(
     s"Сервер запущен http://172.31.16.228:3031/\nНажмите RETURN чтобы прекратить работу..."

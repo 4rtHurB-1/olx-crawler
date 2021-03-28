@@ -23,6 +23,7 @@ object Config {
   val mongo: MongoDb = MongoDb(cfg.getString("olx.mongo.url"), cfg.getString("olx.mongo.database"))
   val userAgent: String = cfg.getString("olx.userAgent")
   val ipAddress: String = cfg.getString("olx.ipAddress")
+  val port: Int = cfg.getInt("olx.port")
   val clientConnectingTimeout: FiniteDuration = FiniteDuration(cfg.getDuration("olx.clientConnectingTimeout").toMillis, TimeUnit.MILLISECONDS)
 
 }
